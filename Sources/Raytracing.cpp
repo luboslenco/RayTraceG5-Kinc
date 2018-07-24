@@ -54,8 +54,26 @@ int kore(int argc, char** argv) {
 	
 	commandList->end(); // TODO: Otherwise "Reset fails because the command list was not closed"
 
-	// Init raytracing structures
-	Graphics5::initRaytracing(commandList);
+	// Pipeline
+	FileReader rayShader("simple_raygeneration.o");
+	FileReader hitShader("simple_closesthit.o");
+	FileReader missShader("simple_miss.o");
+
+	constantBuffer = new Graphics5::ConstantBuffer(4 * 4);
+	constantBuffer->lock();
+	constantBuffer->setFloat(0, -1);
+	constantBuffer->setFloat(4, -1);
+	constantBuffer->setFloat(8, 1);
+	constantBuffer->setFloat(12, 1);
+	constantBuffer->unlock();
+
+	pipeline = new Graphics5::RayTracePipeline(
+		commandList,
+		rayShader.readAll(), rayShader.size(),
+		hitShader.readAll(), hitShader.size(),
+		missShader.readAll(), missShader.size(),
+		constantBuffer
+	);
 
 	// Acceleration structure
 	Graphics4::VertexStructure structure;
@@ -73,26 +91,6 @@ int kore(int argc, char** argv) {
 	ib->unlock();
 
 	accel = new Graphics5::AccelerationStructure(commandList, vb, ib);
-
-	// Pipeline
-	FileReader rayShader("simple_raygeneration.o");
-	FileReader hitShader("simple_closesthit.o");
-	FileReader missShader("simple_miss.o");
-
-	constantBuffer = new Graphics5::ConstantBuffer(4 * 4);
-	constantBuffer->lock();
-	constantBuffer->setFloat(0, -1);
-	constantBuffer->setFloat(4, -1);
-	constantBuffer->setFloat(8, 1);
-	constantBuffer->setFloat(12, 1);
-	constantBuffer->unlock();
-
-	pipeline = new Graphics5::RayTracePipeline(
-		rayShader.readAll(), rayShader.size(),
-		hitShader.readAll(), hitShader.size(),
-		missShader.readAll(), missShader.size(),
-		constantBuffer
-	);
 
 	// Output
 	target = new Graphics5::RayTraceTarget(1280, 720);
