@@ -5,3 +5,5 @@ Build:
 
 Reference:
 https://github.com/Microsoft/DirectX-Graphics-Samples/tree/master/Samples/Desktop/D3D12Raytracing
+
+![](img.jpg)
