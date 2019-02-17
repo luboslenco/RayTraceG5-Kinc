@@ -2,8 +2,6 @@
 #ifndef RAYTRACING_GEN_HLSL
 #define RAYTRACING_GEN_HLSL
 
-#define USE_NON_NULL_LOCAL_ROOT_SIG 1
-
 struct RayGenConstantBuffer {
 	float4 viewport;
 };
@@ -18,7 +16,7 @@ ConstantBuffer<RayGenConstantBuffer> g_rayGenCB : register(b0);
 
 [shader("raygeneration")]
 void raygeneration() {
-	float2 lerpValues = (float2)DispatchRaysIndex() / DispatchRaysDimensions();
+	float2 lerpValues = (float2)DispatchRaysIndex() / (float2)DispatchRaysDimensions();
 	float3 rayDir = float3(0, 0, 1);
 	float3 origin = float3( // x = left, y = top, z = right, w = bottom
 		lerp(g_rayGenCB.viewport.x, g_rayGenCB.viewport.z, lerpValues.x),
@@ -32,7 +30,7 @@ void raygeneration() {
 	ray.TMax = 100.0;
 	RayPayload payload = { float4(0, 0, 0, 0) };
 	TraceRay(Scene, RAY_FLAG_CULL_BACK_FACING_TRIANGLES, ~0, 0, 1, 0, ray, payload);
-	RenderTarget[DispatchRaysIndex()] = payload.color;
+	RenderTarget[DispatchRaysIndex().xy] = payload.color;
 }
 
 #endif // RAYTRACING_GEN_HLSL
