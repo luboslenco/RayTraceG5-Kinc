@@ -55,7 +55,7 @@ int kore(int argc, char** argv) {
 	commandList->end(); // TODO: Otherwise "Reset fails because the command list was not closed"
 
 	// Pipeline
-	FileReader rayTraceShader("simple.o");
+	FileReader rayTraceShader("simple.cso");
 
 	constantBuffer = new Graphics5::ConstantBuffer(4 * 4);
 	constantBuffer->lock();
