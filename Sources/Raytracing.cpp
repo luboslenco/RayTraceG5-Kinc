@@ -55,9 +55,7 @@ int kore(int argc, char** argv) {
 	commandList->end(); // TODO: Otherwise "Reset fails because the command list was not closed"
 
 	// Pipeline
-	FileReader rayShader("simple_raygeneration.o");
-	FileReader hitShader("simple_closesthit.o");
-	FileReader missShader("simple_miss.o");
+	FileReader rayTraceShader("simple.o");
 
 	constantBuffer = new Graphics5::ConstantBuffer(4 * 4);
 	constantBuffer->lock();
@@ -67,13 +65,7 @@ int kore(int argc, char** argv) {
 	constantBuffer->setFloat(12, 1);
 	constantBuffer->unlock();
 
-	pipeline = new Graphics5::RayTracePipeline(
-		commandList,
-		rayShader.readAll(), rayShader.size(),
-		hitShader.readAll(), hitShader.size(),
-		missShader.readAll(), missShader.size(),
-		constantBuffer
-	);
+	pipeline = new Graphics5::RayTracePipeline(commandList, rayTraceShader.readAll(), rayTraceShader.size(), constantBuffer);
 
 	// Acceleration structure
 	Graphics4::VertexStructure structure;
