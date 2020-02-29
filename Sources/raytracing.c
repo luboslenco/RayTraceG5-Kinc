@@ -3,6 +3,7 @@
 #include <kinc/graphics5/graphics.h>
 #include <kinc/graphics5/pipeline.h>
 #include <kinc/graphics5/shader.h>
+#include <kinc/graphics5/texture.h>
 #include <kinc/graphics5/vertexbuffer.h>
 #include <kinc/graphics5/indexbuffer.h>
 #include <kinc/graphics5/constantbuffer.h>
@@ -18,7 +19,7 @@ static int current_buffer = -1;
 static kinc_g5_render_target_t framebuffers[BUFFER_COUNT];
 static kinc_g5_command_list_t command_list;
 static kinc_g5_constant_buffer_t constant_buffer;
-static kinc_raytrace_target_t target;
+static kinc_g5_texture_t output;
 static kinc_raytrace_pipeline_t pipeline;
 static kinc_raytrace_acceleration_structure_t accel;
 
@@ -40,9 +41,9 @@ static void update() {
 	kinc_g5_command_list_begin(&command_list);
 	kinc_raytrace_set_acceleration_structure(&accel);
 	kinc_raytrace_set_pipeline(&pipeline);
-	kinc_raytrace_set_target(&target);
+	kinc_raytrace_set_target(&output);
 	kinc_raytrace_dispatch_rays(&command_list);
-	kinc_raytrace_copy_target(&command_list, &framebuffers[current_buffer], &target);
+	kinc_raytrace_copy(&command_list, &framebuffers[current_buffer], &output);
 	kinc_g5_command_list_end(&command_list);
 
 	kinc_g5_end(0);
@@ -79,12 +80,14 @@ int kickstart(int argc, char** argv) {
 	kinc_g5_constant_buffer_set_float(&constant_buffer, 12, 1);
 	kinc_g5_constant_buffer_unlock(&constant_buffer);
 
+	kinc_g5_texture_init_non_sampled_access(&output, kinc_window_width(0), kinc_window_height(0), KINC_IMAGE_FORMAT_RGBA32);
+
 	kinc_raytrace_pipeline_init(&pipeline, &command_list, data, data_size, &constant_buffer);
 
 	kinc_g5_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
 	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
-	
+
 	kinc_g5_vertex_buffer_t vertices;
 	kinc_g5_vertex_buffer_init(&vertices, 3, &structure, true, 0);
 	float *v = kinc_g5_vertex_buffer_lock_all(&vertices);
@@ -102,7 +105,6 @@ int kickstart(int argc, char** argv) {
 	// kinc_g5_command_list_upload_index_buffer(&command_list, &indices);
 
 	kinc_raytrace_acceleration_structure_init(&accel, &command_list, &vertices, &indices);
-	kinc_raytrace_target_init(&target, kinc_window_width(0), kinc_window_height(0));
 
 	kinc_start();
 
