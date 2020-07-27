@@ -20,6 +20,6 @@ Compile shader:
 `.\dxc.exe -Zpr -Fo .\simple.spv -T lib_6_4 .\simple.hlsl -spirv -fvk-use-scalar-layout -fspv-target-env="vulkan1.2"`
 
 Reference:
-https://github.com/SaschaWillems/Vulkan/blob/master/examples/nv_ray_tracing_basic/nv_ray_tracing_basic.cpp
+https://github.com/KhronosGroup/Vulkan-Samples/blob/master/samples/extensions/raytracing_basic/raytracing_basic.cpp
 
 ![](img.jpg)
