@@ -63,7 +63,9 @@ int kickstart(int argc, char** argv) {
 			-i - 1 /* hack in an index for backbuffer render targets */);
 	}
 
+	#ifdef KORE_DXR
 	kinc_g5_command_list_end(&command_list); // TODO: Otherwise "This API cannot be called on a closed command list."
+	#endif
 
 	kinc_file_reader_t file;
 	#ifdef KORE_DXR
