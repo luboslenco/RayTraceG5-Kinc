@@ -66,7 +66,11 @@ int kickstart(int argc, char** argv) {
 	kinc_g5_command_list_end(&command_list); // TODO: Otherwise "This API cannot be called on a closed command list."
 
 	kinc_file_reader_t file;
+	#ifdef KORE_DXR
 	kinc_file_reader_open(&file, "simple.cso", KINC_FILE_TYPE_ASSET);
+	#else
+	kinc_file_reader_open(&file, "simple.spv", KINC_FILE_TYPE_ASSET);
+	#endif
 	size_t data_size = kinc_file_reader_size(&file);
 	uint8_t *data = allocate(data_size);
 	kinc_file_reader_read(&file, data, data_size);
