@@ -17,7 +17,7 @@ Build:
 `node Kinc/make -g vulkan --raytrace vkrt`
 
 Compile shader:
-`.\dxc.exe -Zpr -Fo .\simple.spv -T lib_6_4 .\simple.hlsl -spirv -fvk-use-scalar-layout -fspv-target-env="vulkan1.2"`
+`.\dxc.exe -Zpr -Fo .\simple.spv -T lib_6_4 .\simple.hlsl -spirv -fvk-use-scalar-layout -fspv-target-env="vulkan1.2" -fvk-u-shift 1 all -fvk-b-shift 2 all`
 
 Reference:
 https://github.com/KhronosGroup/Vulkan-Samples/blob/master/samples/extensions/raytracing_basic/raytracing_basic.cpp
