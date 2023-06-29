@@ -3,7 +3,7 @@
 #### Direct3D12
 
 Build:
-`node Kinc/make -g direct3d12 --raytrace dxr`
+`Kinc/make -g direct3d12`
 
 Compile shader:
 `.\dxc.exe -Zpr -Fo .\simple.cso -T lib_6_3 .\simple.hlsl`
@@ -14,7 +14,7 @@ https://github.com/Microsoft/DirectX-Graphics-Samples/tree/master/Samples/Deskto
 #### Vulkan
 
 Build:
-`node Kinc/make -g vulkan --raytrace vkrt`
+`Kinc/make -g vulkan`
 
 Compile shader:
 `.\dxc.exe -Zpr -Fo .\simple.spv -T lib_6_4 .\simple.hlsl -spirv -fvk-use-scalar-layout -fspv-target-env="vulkan1.2" -fvk-u-shift 1 all -fvk-b-shift 2 all`

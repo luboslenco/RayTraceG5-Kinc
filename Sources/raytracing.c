@@ -34,41 +34,39 @@ static void *allocate(size_t size) {
 	return &heap[old_top];
 }
 
-static void update() {
+static void update(void *data) {
 	current_buffer = (current_buffer + 1) % BUFFER_COUNT;
-	kinc_g5_begin(&framebuffers[current_buffer], 0);
 
+	kinc_g5_begin(&framebuffers[current_buffer], 0);
 	kinc_g5_command_list_begin(&command_list);
 	kinc_raytrace_set_acceleration_structure(&accel);
 	kinc_raytrace_set_pipeline(&pipeline);
 	kinc_raytrace_set_target(&output);
+
 	kinc_raytrace_dispatch_rays(&command_list);
 	kinc_raytrace_copy(&command_list, &framebuffers[current_buffer], &output);
-	kinc_g5_command_list_end(&command_list);
 
+	kinc_g5_command_list_end(&command_list);
+	kinc_g5_command_list_execute(&command_list);
+	kinc_g5_command_list_wait_for_execution_to_finish(&command_list);
 	kinc_g5_end(0);
 	kinc_g5_swap_buffers();
 }
 
 int kickstart(int argc, char** argv) {
 	kinc_init("Raytracing", 1280, 720, NULL, NULL);
-	kinc_set_update_callback(update);
+	kinc_set_update_callback(update, NULL);
 
 	heap = (uint8_t*)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 
 	kinc_g5_command_list_init(&command_list);
 	for (int i = 0; i < BUFFER_COUNT; ++i) {
-		kinc_g5_render_target_init(&framebuffers[i], kinc_window_width(0), kinc_window_height(0), 16, false, KINC_G5_RENDER_TARGET_FORMAT_32BIT, -1,
-			-i - 1 /* hack in an index for backbuffer render targets */);
+		kinc_g5_render_target_init_framebuffer(&framebuffers[i], kinc_window_width(0), kinc_window_height(0), KINC_G5_RENDER_TARGET_FORMAT_32BIT, 0, 0);
 	}
 
-	#ifdef KORE_DXR
-	kinc_g5_command_list_end(&command_list); // TODO: Otherwise "This API cannot be called on a closed command list."
-	#endif
-
 	kinc_file_reader_t file;
-	#ifdef KORE_DXR
+	#ifdef KORE_DIRECT3D12
 	kinc_file_reader_open(&file, "simple.cso", KINC_FILE_TYPE_ASSET);
 	#else
 	kinc_file_reader_open(&file, "simple.spv", KINC_FILE_TYPE_ASSET);
@@ -104,10 +102,10 @@ int kickstart(int argc, char** argv) {
 	// kinc_g5_command_list_upload_vertex_buffer(&command_list, &vertices);
 
 	kinc_g5_index_buffer_t indices;
-	kinc_g5_index_buffer_init(&indices, 3, true);
-	int *i = kinc_g5_index_buffer_lock(&indices);
+	kinc_g5_index_buffer_init(&indices, 3, KINC_G5_INDEX_BUFFER_FORMAT_32BIT, true);
+	int *i = kinc_g5_index_buffer_lock_all(&indices);
 	i[0] = 0; i[1] = 1; i[2] = 2;
-	kinc_g5_index_buffer_unlock(&indices);
+	kinc_g5_index_buffer_unlock_all(&indices);
 	// kinc_g5_command_list_upload_index_buffer(&command_list, &indices);
 
 	kinc_raytrace_acceleration_structure_init(&accel, &command_list, &vertices, &indices);
