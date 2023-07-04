@@ -94,8 +94,8 @@ int kickstart(int argc, char** argv) {
 	kinc_file_reader_open(&file, "simple.cso", KINC_FILE_TYPE_ASSET);
 	#elif KORE_METAL
 	kinc_g1_init(1280, 720);
-    kinc_file_reader_open(&file, "simple.metal", KINC_FILE_TYPE_ASSET);
-    #else
+	kinc_file_reader_open(&file, "simple.metal", KINC_FILE_TYPE_ASSET);
+	#else
 	kinc_file_reader_open(&file, "simple.spv", KINC_FILE_TYPE_ASSET);
 	#endif
 	size_t data_size = kinc_file_reader_size(&file);
