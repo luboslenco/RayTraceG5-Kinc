@@ -22,4 +22,12 @@ Compile shader:
 Reference:
 https://github.com/KhronosGroup/Vulkan-Samples/blob/master/samples/extensions/raytracing_basic/raytracing_basic.cpp
 
+#### Metal
+
+Build:
+`Kinc/make -g metal`
+
+Reference:
+https://developer.apple.com/documentation/metal/metal_sample_code_library/accelerating_ray_tracing_using_metal
+
 ![](img.jpg)

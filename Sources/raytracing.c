@@ -27,6 +27,23 @@ static kinc_raytrace_acceleration_structure_t accel;
 static uint8_t *heap = NULL;
 static size_t heap_top = 0;
 
+#ifdef KORE_METAL
+#include <kinc/graphics1/graphics.h>
+static uint8_t pixels[1280 * 720 * 4];
+static void draw_image(uint8_t *pixels, int x, int y) {
+	uint8_t *g1image = (uint8_t *)kinc_internal_g1_image;
+	for (int i = 0; i < 1280 * 720; ++i) {
+		int xpos = i % 1280 + x;
+		int ypos = i / 1280 + y;
+		int j = ypos * 1280 + xpos;
+		g1image[j * 4] = pixels[i * 4];
+		g1image[j * 4 + 1] = pixels[i * 4 + 1];
+		g1image[j * 4 + 2] = pixels[i * 4 + 2];
+		g1image[j * 4 + 3] = pixels[i * 4 + 3];
+	}
+}
+#endif
+
 static void *allocate(size_t size) {
 	size_t old_top = heap_top;
 	heap_top += size;
@@ -45,11 +62,18 @@ static void update(void *data) {
 
 	kinc_raytrace_dispatch_rays(&command_list);
 	kinc_raytrace_copy(&command_list, &framebuffers[current_buffer], &output);
-
 	kinc_g5_command_list_end(&command_list);
 	kinc_g5_command_list_execute(&command_list);
 	kinc_g5_command_list_wait_for_execution_to_finish(&command_list);
 	kinc_g5_end(0);
+
+	#ifdef KORE_METAL
+	kinc_g5_command_list_get_render_target_pixels(&command_list, &framebuffers[current_buffer], pixels);
+	kinc_g1_begin();
+	draw_image(pixels, 0, 0);
+	kinc_g1_end();
+	#endif
+
 	kinc_g5_swap_buffers();
 }
 
@@ -68,7 +92,10 @@ int kickstart(int argc, char** argv) {
 	kinc_file_reader_t file;
 	#ifdef KORE_DIRECT3D12
 	kinc_file_reader_open(&file, "simple.cso", KINC_FILE_TYPE_ASSET);
-	#else
+	#elif KORE_METAL
+	kinc_g1_init(1280, 720);
+    kinc_file_reader_open(&file, "simple.metal", KINC_FILE_TYPE_ASSET);
+    #else
 	kinc_file_reader_open(&file, "simple.spv", KINC_FILE_TYPE_ASSET);
 	#endif
 	size_t data_size = kinc_file_reader_size(&file);
