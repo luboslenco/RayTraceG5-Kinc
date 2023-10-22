@@ -17,7 +17,7 @@ Build:
 `Kinc/make -g vulkan`
 
 Compile shader (Linux):
-`./dxc.exe -Zpr -Fo ./simple.spv -T lib_6_4 ./simple.hlsl -spirv -fvk-use-scalar-layout -fspv-target-env="vulkan1.2" -fvk-u-shift 1 all -fvk-b-shift 2 all`
+`./dxc -Zpr -Fo ./simple.spv -T lib_6_4 ./simple.hlsl -spirv -fvk-use-scalar-layout -fspv-target-env="vulkan1.2" -fvk-u-shift 1 all -fvk-b-shift 2 all`
 
 Reference:
 https://github.com/KhronosGroup/Vulkan-Samples/blob/main/samples/extensions/ray_tracing_basic/ray_tracing_basic.cpp
